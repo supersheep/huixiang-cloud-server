@@ -9,10 +9,10 @@ AV.Cloud.define('hello', function(request, response) {
 
 AV.Cloud.define('featured', function(request, response) {
   var query = new AV.Query('Piece')
-  // query.equalTo('objectId', '1')
+
   query.count().then(function (result) {
     var nums = []
-    while (nums.length < 100) {
+    while (nums.length < Math.min(100, request.params.amount)) {
       var num = Math.floor(Math.random() * result)
       if (nums.indexOf(num) == -1) {
         nums.push(num)
