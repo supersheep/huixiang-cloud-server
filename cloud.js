@@ -11,6 +11,7 @@ AV.Cloud.define('createUserWithThirdPartyUser', function(request, response) {
   var thirdPartyUser = request.params.thirdPartyUser
   var username = request.params.username
   var password = request.params.password
+  var nickname = request.params.nickname
 
   if (!thirdPartyUser) {
     response.error('missing thirdPartyUser')
@@ -28,11 +29,15 @@ AV.Cloud.define('createUserWithThirdPartyUser', function(request, response) {
     response.error('missing thirdPartyUser.accessKey')
   }
 
+  if (!nickname) {
+    response.error('missing nickname')
+  }
+
   var attrs = {}
   attrs[thirdPartyUser.platform + 'Id'] = thirdPartyUser.id
   attrs[thirdPartyUser.platform + 'AccessToken'] = thirdPartyUser.accessToken
   attrs[thirdPartyUser.platform + 'Binded'] = 1
-  attrs[name] = username
+  attrs.name = nickname
 
   AV.User.signUp(username, password, attrs)
     .then((user) => {
@@ -42,10 +47,62 @@ AV.Cloud.define('createUserWithThirdPartyUser', function(request, response) {
     })
 })
 
+AV.Cloud.define('bindUserWithThirdPartyUser', function(request, response) {
+  var thirdPartyUser = request.params.thirdPartyUser
+  var username = request.params.username
+  var password = request.params.password
+  var nickname = request.params.nickname
+  var platform = thirdPartyUser.platform || 'weibo'
+
+  if (!thirdPartyUser.id) {
+    return response.error('missing thirdPartyUser.id')
+  }
+
+  if (!thirdPartyUser.accessToken) {
+    return response.error('missing thirdPartyUser.accessToken')
+  }
+
+  var queryId = new AV.Query('_User')
+  var platformKey = platform + 'Id'
+  queryId.equalTo(platformKey, thirdPartyUser.id)
+
+  var queryAccessToken = new AV.Query('_User')
+  var accessTokenKey = platform + 'AccessToken'
+  queryAccessToken.equalTo(accessTokenKey, thirdPartyUser.accessToken)
+
+  var query = AV.Query.and(queryId, queryAccessToken)
+
+  queryId.first()
+    .then((user) => {
+      if (!user) {
+        response.error('thirdparty user not exists')
+      } else {
+        user.setUsername(username)
+        user.setPassword(password)
+        user.set('name', nickname)
+        user.set(platform + 'Binded', 1)
+        user.save()
+          .then((u) => {
+            response.success(u)
+          })
+          .catch((err) => {
+            response.error(err)
+          })
+      }
+    })
+    .catch((err) => {
+      response.error(err)
+    })
+})
+
 AV.Cloud.define('getThirdPartyUser', function(request, response) {
-  var query = new AV.Query('_User')
-  var platformKey = (request.params.platform || 'weibo') + 'Id'
-  query.equalTo(platformKey, request.params.id || 0).first().then(function(result){
+  var queryId = new AV.Query('_User')
+    .equalTo((request.params.platform || 'weibo') + 'Id', request.params.id || 0)
+  var queryValid = new AV.Query('_User')
+    .notEqualTo('invalid', true)
+
+  var query = AV.Query.and(queryId, queryValid)
+  query.first().then(function(result){
     if (result) {
       response.success(result)
     } else {
