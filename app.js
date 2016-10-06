@@ -11,6 +11,7 @@ var app = express();
 // 设置模板引擎
 app.set('views', path.join(__dirname, 'views'));
 app.set('view engine', 'ejs');
+app.use(AV.Cloud.CookieSession({ secret: 'my secret', maxAge: 3600000, fetchUser: true }));
 app.use(express.static('public'));
 
 // 设置默认超时时间

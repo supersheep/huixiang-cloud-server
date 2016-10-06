@@ -7,6 +7,38 @@ AV.Cloud.define('hello', function(request, response) {
   response.success('Hello world!');
 });
 
+AV.Cloud.define('getPieceDetail', function(request, response) {
+  var query = new AV.Query('Piece')
+  var currentUser = request.currentUser
+  console.log(currentUser && currentUser.id)
+  query.get(request.params.pieceId)
+
+
+
+  query.first()
+    .then((piece) => {
+      if (piece.get('user').get('objectId') === request.currentUser.get('objectId')) {
+        piece.set('faved', true)
+      } else {
+          new AV.Query('Fav')
+            .equalTo('piece', piece)
+            .equalTo('user', request.currentUser)
+            .count()
+              .then((count) => {
+                piece.set('faved', count > 0)
+                response.success(piece)
+              })
+              .catch((err) => {
+                response.error(err)
+              })
+      }
+      response.success(piece)
+    })
+    .catch((err) => {
+      response.error(err)
+    })
+})
+
 AV.Cloud.define('createUserWithThirdPartyUser', function(request, response) {
   var thirdPartyUser = request.params.thirdPartyUser
   var username = request.params.username
