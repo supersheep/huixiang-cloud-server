@@ -7,13 +7,31 @@ AV.Cloud.define('hello', function(request, response) {
   response.success('Hello world!');
 });
 
+AV.Cloud.define('getMyPieces', function(request, response) {
+    var query = new AV.Query('Fav')
+    var page = request.params.page || 0
+    var limit = 200
+
+    query.include('piece')
+    query.equalTo('user', request.currentUser)
+    query.descending('createdAt')
+    query.limit(limit)
+    query.skip(page * limit)
+    query.find()
+      .then((favs) => {
+        response.success(favs.map((fav) => {
+          return fav.get('piece')
+        }))
+      })
+      .catch((err) => {
+        response.error(err)
+      })
+})
+
 AV.Cloud.define('getPieceDetail', function(request, response) {
   var query = new AV.Query('Piece')
   var currentUser = request.currentUser
-  console.log(currentUser && currentUser.id)
   query.get(request.params.pieceId)
-
-
 
   query.first()
     .then((piece) => {
@@ -33,6 +51,23 @@ AV.Cloud.define('getPieceDetail', function(request, response) {
               })
       }
       response.success(piece)
+    })
+    .catch((err) => {
+      response.error(err)
+    })
+})
+
+AV.Cloud.define('getPieceFavs', function(request, response) {
+  var query = new AV.Query('Fav')
+  var piece = AV.Object.createWithoutData('Piece', request.params.pieceId)
+
+  query.equalTo('piece', piece)
+  query.include('user')
+  query.find()
+    .then((favs) => {
+      response.success(favs.map((fav) => {
+        return fav.get('user')
+      }))
     })
     .catch((err) => {
       response.error(err)
