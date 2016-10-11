@@ -35,7 +35,7 @@ AV.Cloud.define('getPieceDetail', function(request, response) {
 
   query.first()
     .then((piece) => {
-      if (piece.get('user').get('objectId') === request.currentUser.get('objectId')) {
+      if (request.currentUser && piece.get('user').get('objectId') === request.currentUser.get('objectId')) {
         piece.set('faved', true)
       } else {
           new AV.Query('Fav')
