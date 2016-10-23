@@ -28,6 +28,71 @@ AV.Cloud.define('getMyPieces', function(request, response) {
       })
 })
 
+AV.Cloud.define('favPiece', function(request, response) {
+  var Fav = AV.Object.extend('Fav')
+  var fav = new Fav()
+  var currentUser = request.currentUser
+
+  if (!currentUser) {
+    return response.error('请先登录')
+  }
+
+  if (!request.params.pieceId) {
+    return response.error('missing pieceId')
+  }
+
+  var query = new AV.Query('Piece')
+  query.get(request.params.pieceId)
+  query.first()
+    .then((piece) => {
+      fav.set('user', currentUser)
+      fav.set('piece', piece)
+      return fav.save()
+    })
+    .then((newFav) => {
+      response.success(newFav)
+    })
+    .catch((err) => {
+      response.error(err)
+    })
+})
+
+AV.Cloud.define('unfavPiece', function(request, response) {
+  var Fav = AV.Object.extend('Fav')
+  var fav = new Fav()
+  var currentUser = request.currentUser
+
+  if (!currentUser) {
+    return response.error('请先登录')
+  }
+
+  if (!request.params.pieceId) {
+    return response.error('missing pieceId')
+  }
+
+  var query = new AV.Query('Piece')
+  query.get(request.params.pieceId)
+  query.first()
+    .then((piece) => {
+      if (!piece) { throw new Error('该记录不存在')}
+      var query = new AV.Query('Fav')
+      query.equalTo('piece', piece)
+      query.equalTo('user', currentUser)
+      return query.first()
+        .then((fav) => {
+          if (!fav) {throw new Error('无权访问该记录')}
+          console.log('fav', fav)
+          return fav.destroy()
+        })
+    })
+    .then((newFav) => {
+      response.success('success')
+    })
+    .catch((err) => {
+      response.error(err)
+    })
+})
+
 AV.Cloud.define('getPieceDetail', function(request, response) {
   var query = new AV.Query('Piece')
   var currentUser = request.currentUser
@@ -53,6 +118,41 @@ AV.Cloud.define('getPieceDetail', function(request, response) {
       response.success(piece)
     })
     .catch((err) => {
+      response.error(err)
+    })
+})
+
+AV.Cloud.define('createPiece', function(request, response){
+  var Piece = AV.Object.extend("Piece");
+  var piece = new Piece();
+  var pieceData = request.params.piece
+  var currentUser = request.currentUser
+
+  if (!currentUser) {
+    return response.error('请先登录')
+  }
+
+  if (!pieceData.content) {
+    return response.error('请填写内容')
+  }
+
+  if (!pieceData.content.length > 280){
+    return response.error('内容请勿超过280')
+  }
+
+  piece.set('content', pieceData.content)
+  piece.set('user', currentUser)
+  piece.save()
+    .then((newPiece) => {
+      var Fav = AV.Object.extend('Fav')
+      var fav = new Fav();
+      fav.set('user', currentUser)
+      fav.set('piece', newPiece)
+      piece = newPiece
+      return fav.save()
+    }).then(() => {
+      response.success(piece)
+    }).catch((err) => {
       response.error(err)
     })
 })
