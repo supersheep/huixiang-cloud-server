@@ -29,8 +29,6 @@ AV.Cloud.define('getMyPieces', function(request, response) {
 })
 
 AV.Cloud.define('favPiece', function(request, response) {
-  var Fav = AV.Object.extend('Fav')
-  var fav = new Fav()
   var currentUser = request.currentUser
 
   if (!currentUser) {
@@ -41,10 +39,22 @@ AV.Cloud.define('favPiece', function(request, response) {
     return response.error('missing pieceId')
   }
 
+  var piece = null
   var query = new AV.Query('Piece')
   query.get(request.params.pieceId)
   query.first()
-    .then((piece) => {
+    .then((_piece) => {
+      if (!_piece) {throw new Error('该内容不存在')}
+      piece = _piece
+      var query = new AV.Query('Fav')
+      query.equalTo('user', currentUser)
+      query.equalTo('piece', _piece)
+      return query.first()
+    })
+    .then((oldFav) => {
+      if (oldFav) {throw new Error('已经收藏过该内容')}
+      var Fav = AV.Object.extend('Fav')
+      var fav = new Fav()
       fav.set('user', currentUser)
       fav.set('piece', piece)
       return fav.save()
@@ -74,7 +84,7 @@ AV.Cloud.define('unfavPiece', function(request, response) {
   query.get(request.params.pieceId)
   query.first()
     .then((piece) => {
-      if (!piece) { throw new Error('该记录不存在')}
+      if (!piece) { throw new Error('该内容不存在')}
       var query = new AV.Query('Fav')
       query.equalTo('piece', piece)
       query.equalTo('user', currentUser)
