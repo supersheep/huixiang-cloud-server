@@ -1,0 +1,82 @@
+<!doctype html>
+<html lang="en">
+
+  <head>
+    <meta charset="UTF-8">
+    <title>$title</title>
+    <link rel="stylesheet" href="/static/css/base.css" /> $if name:
+    <link rel="stylesheet" href="/static/css/${name}.css" />
+    <link rel="shortcut icon" href="/static/favicon.ico" />
+    <meta name="apple-itunes-app" content="app-id=669860898">
+    <script>
+      (function(i, s, o, g, r, a, m) {
+        i['GoogleAnalyticsObject'] = r;
+        i[r] = i[r] || function() {
+          (i[r].q = i[r].q || []).push(arguments)
+        }, i[r].l = 1 * new Date();
+        a = s.createElement(o),
+          m = s.getElementsByTagName(o)[0];
+        a.async = 1;
+        a.src = g;
+        m.parentNode.insertBefore(a, m)
+      })(window, document, 'script', '//www.google-analytics.com/analytics.js', 'ga');
+      ga('create', 'UA-40645385-1', 'huixiang.im');
+      ga('send', 'pageview');
+
+    </script>
+    <meta name="viewport" content="initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0">
+    <script src="/static/neurons/neuron.js"></script>
+    <script src="/static/neurons/config.js"></script>
+    <script>
+      neuron.config({
+        path: "/static/neurons"
+      });
+
+    </script>
+  </head>
+
+  <body>
+    <div id="hd">
+      <div class="tt">
+        <a href="/">
+          <span class="quote">「</span>$config['sitename']
+          <span class="quote">」</span>
+        </a>
+      </div>
+      <div class="account">
+        $if user:
+        <img src="$user[" avatar "]" class="avatar" /> $else:
+        <img src="/static/img/default-avatar.png" class="avatar" />
+        <ul class="menu" style="display:none">
+          $if user:
+          <li class="menu-item"><a href="/new" id="write-note">记一句</a></li>
+          <li class="menu-item"><a href="/people/$user[" id "]" id="write-note">我的茴香</a></li>
+          <li class="menu-item"><a href="/tools">工具盒</a></li>
+          <li class="menu-item"><a href="/logout">退出</a></li>
+          $else:
+          <li class="menu-item">
+            <a href="#" class="login_douban">
+              <img src="http://img3.douban.com/pics/douban-icons/favicon_24x24.png" title="豆瓣登录" />
+            </a>
+          </li>
+          <li class="menu-item">
+            <a href="#" class="login_weibo">
+              <img src="http://www.sinaimg.cn/blog/developer/wiki/LOGO_24x24.png" title="微博登录" />
+            </a>
+          </li>
+        </ul>
+      </div>
+    </div>
+    <div id="bd">$:content</div>
+    <div id="ft">
+      <span id="creator">大芋制造</span>
+      <a id="tools" href="/tools">小工具</a>
+      <a id="about" href="/about">关于</a>
+      <a href="/app">移动应用</a> $if ENV == "DEV":
+      <a href="javascript:;">DEV</a>
+    </div>
+    <script type="text/javascript" src='/static/js/header.js'></script>
+    <script type="text/javascript" src='/static/js/<%= name %>.js'></script>
+  </body>
+
+</html>

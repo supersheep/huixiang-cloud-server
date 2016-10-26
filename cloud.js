@@ -12,6 +12,10 @@ AV.Cloud.define('getMyPieces', function(request, response) {
     var page = request.params.page || 0
     var limit = 200
 
+    if (!request.currentUser) {
+      return response.error('请先登录')
+    }
+
     query.include('piece')
     query.equalTo('user', request.currentUser)
     query.descending('createdAt')
@@ -199,11 +203,11 @@ AV.Cloud.define('createUserWithThirdPartyUser', function(request, response) {
   }
 
   if (!thirdPartyUser.platform) {
-    response.error('missing thirdPartyUser.accessKey')
+    response.error('missing thirdPartyUser.platform')
   }
 
-  if (!thirdPartyUser.accessKey) {
-    response.error('missing thirdPartyUser.accessKey')
+  if (!thirdPartyUser.accessToken) {
+    response.error('missing thirdPartyUser.accessToken')
   }
 
   if (!nickname) {
