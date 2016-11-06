@@ -190,4 +190,31 @@ AV.Cloud.define('getPieceFavs', function(request, response) {
     })
 })
 
+AV.Cloud.define('featured', function(request, response) {
+
+  var query = new AV.Query('Piece')
+
+  query.count().then(function (result) {
+    var nums = []
+    while (nums.length < Math.min(100, request.params.amount || 100)) {
+      var num = Math.floor(Math.random() * result)
+      if (nums.indexOf(num) == -1) {
+        nums.push(num)
+      }
+    }
+    var subQuerys = nums.map((num) => {
+      return new AV.Query('Piece').equalTo('objectId', `${num}`)
+    })
+    var query = AV.Query.or.apply(null, subQuerys)
+
+    return query.find()
+  }).then((result) => {
+    response.success(result)
+  }).catch((err) => {
+    response.error(err)
+  })
+})
+
+
+
 module.exports = AV.Cloud;
