@@ -24,7 +24,7 @@ AV.Cloud.define('getMyPieces', function(request, response) {
     query.find()
       .then((favs) => {
         response.success(favs.map((fav) => {
-          let piece = fav.get('piece')
+          var piece = fav.get('piece')
           piece.set('createdAt', fav.get('createdAt'))
           return piece
         }))
@@ -192,6 +192,7 @@ AV.Cloud.define('getPieceFavs', function(request, response) {
 
 AV.Cloud.define('creatorPosts', function(request, response) {
   var query = new AV.Query('CreatorPost')
+  query.descending('createdAt')
   query.find()
     .then(function(result) {
       console.log('result', result)
