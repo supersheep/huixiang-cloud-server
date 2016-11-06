@@ -190,6 +190,19 @@ AV.Cloud.define('getPieceFavs', function(request, response) {
     })
 })
 
+AV.Cloud.define('creatorPosts', function(request, response) {
+  var query = new AV.Query('CreatorPost')
+  query.find()
+    .then(function(result) {
+      console.log('result', result)
+      response.success(result)
+    })
+    .catch(function(err) {
+      console.log(err)
+      response.error(err)
+    })
+})
+
 AV.Cloud.define('featured', function(request, response) {
 
   var query = new AV.Query('Piece')
