@@ -73,6 +73,21 @@ AV.Cloud.define('favPiece', function(request, response) {
     })
 })
 
+AV.Cloud.define('removePiece', function(request, response) {
+  var query = new AV.Query('Piece')
+  query.equalTo('objectId', request.params.id)
+  query.first((piece) => {
+    if (!piece) {
+      return response.error('piece not exists')
+    }
+    piece.set('valid', false)
+    piece.save()
+      .then(() => {
+        response.success('success')
+      })
+  })
+})
+
 AV.Cloud.define('unfavPiece', function(request, response) {
   var Fav = AV.Object.extend('Fav')
   var fav = new Fav()
@@ -183,6 +198,26 @@ AV.Cloud.define('getPieceFavs', function(request, response) {
     .then((favs) => {
       response.success(favs.map((fav) => {
         return fav.get('user')
+      }))
+    })
+    .catch((err) => {
+      response.error(err)
+    })
+})
+
+AV.Cloud.define('getPieces', function(request, response) {
+  var query = new AV.Query('Piece')
+  var page = request.params.page || 1
+  var limit = 50
+  query.include('user')
+  query.skip(Math.max(page - 1, 0) * limit)
+  query.descending('createdAt')
+  query.notEqualTo('valid', false)
+  query.find()
+    .then((pieces) => {
+      response.success(pieces.map((p) => {
+        p.set('user', p.get('user'))
+        return p
       }))
     })
     .catch((err) => {
