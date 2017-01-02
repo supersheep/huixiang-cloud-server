@@ -6,7 +6,7 @@
     <el-table-column
       inline-template
       label="id"
-      width="250">
+      width="150">
       <div>
         <span style="margin-left: 10px">{{ row.objectId }}</span>
       </div>
@@ -14,8 +14,8 @@
     <el-table-column
       inline-template
       label="用户"
-      width="200">
-      <div>{{row.user.name || row.user.username}}</div>
+      width="150">
+      <router-link :to="'/piece?userId=' + row.user.objectId" tag="a">{{row.user.name || row.user.username}}</router-link>
     </el-table-column>
     <el-table-column
       inline-template
@@ -27,7 +27,7 @@
     <el-table-column
       inline-template
       label="时间"
-      width="200">
+      width="150">
       <div>{{timeStr(row.createdAt)}}</div>
     </el-table-column>
 
@@ -39,7 +39,7 @@
         <span v-if="row.rank">
           {{row.rank}}分
         </span>
-        <span v-else>
+        <span>
           <el-button
             size="small"
             type="success"
@@ -73,8 +73,6 @@
       </div>
     </el-table-column>
   </el-table>
-
-
 </template>
 
 <script>
@@ -87,17 +85,27 @@
         pieces: []
       }
     },
+    watch: {
+      '$route': 'fetchData'
+    },
+    updated () {
+      console.log('updated')
+    },
     mounted () {
-      request.get('/piece')
-        .then((pieces) => {
-          console.log(pieces)
-          this.pieces = pieces
-        })
-        .catch((err) => {
-          console.log(err)
-        })
+      this.fetchData()
     },
     methods: {
+      fetchData () {
+        console.log(this.$route.query)
+        request.get('/piece', this.$route.query)
+          .then((pieces) => {
+            console.log(pieces)
+            this.pieces = pieces
+          })
+          .catch((err) => {
+            console.log(err)
+          })
+      },
       timeStr (timestamp) {
         return moment(timestamp).format('YYYY-MM-DD HH:mm')
       },

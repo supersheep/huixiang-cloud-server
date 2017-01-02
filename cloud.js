@@ -80,7 +80,7 @@ AV.Cloud.define('rankPiece', function(request, response) {
 
 
 AV.Cloud.define('getPieces', function(request, response) {
-  pieceService.getPieceList(request.params.page)
+  pieceService.getPieceList(request.params.page, request.params)
     .then(response.success)
     .catch(response.error)
 })

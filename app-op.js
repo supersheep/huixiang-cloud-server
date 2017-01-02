@@ -80,7 +80,8 @@ app.post('/api/login', function(req, res, next) {
 
 app.get('/api/piece', auth, function(req, res) {
   AV.Cloud.run('getPieces', {
-    page: req.query.page
+    page: req.query.page,
+    userId: req.query.userId
   }).then((result) => {
     res.json(result.map((data) => {
       return data.toJSON()

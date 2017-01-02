@@ -1,3 +1,4 @@
+import qs from 'qs'
 let baseURL = '/api'
 
 const request = (method, path, data) => {
@@ -9,9 +10,15 @@ const request = (method, path, data) => {
   }
   var token = account.getToken()
   headers['x-access-token'] = token
-  return fetch(baseURL + path, {
+  var url = baseURL + path
+  var canHasBody = ['get', 'head'].indexOf(method) === -1
+  if (!canHasBody) {
+    url += '?' + qs.stringify(data)
+  }
+
+  return fetch(url, {
     method: method,
-    body: JSON.stringify(data),
+    body: canHasBody ? JSON.stringify(data) : null,
     headers: headers,
     credentials: 'include'
   })

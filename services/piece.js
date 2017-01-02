@@ -69,7 +69,7 @@ function getPieceDetail (pieceId, user) {
   })
 }
 
-function getPieceList (page) {
+function getPieceList (page, filter) {
   return new Promise((resolve, reject) => {
     var query = new AV.Query('Piece')
     var limit = 50
@@ -78,6 +78,13 @@ function getPieceList (page) {
     query.skip(Math.max(page - 1, 0) * limit)
     query.descending('createdAt')
     query.notEqualTo('valid', false)
+
+    if (filter.userId) {
+      var user = AV.Object.createWithoutData('_User', filter.userId);
+      console.log('filter by userId', filter.userId)
+      query.equalTo('user', user)
+    }
+
     query.find()
       .then((pieces) => {
         resolve(pieces.map((p) => {
