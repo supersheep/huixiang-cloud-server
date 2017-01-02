@@ -13,15 +13,52 @@
     </el-table-column>
     <el-table-column
       inline-template
+      label="用户"
+      width="200">
+      <div>{{row.user.name || row.user.username}}</div>
+    </el-table-column>
+    <el-table-column
+      inline-template
       label="内容"
-      width="600">
+      width="400">
       <div>{{row.content}}</div>
     </el-table-column>
+
+    <el-table-column
+      inline-template
+      label="时间"
+      width="200">
+      <div>{{timeStr(row.createdAt)}}</div>
+    </el-table-column>
+
     <el-table-column
       :context="_self"
       inline-template
       label="操作">
       <div>
+        <span v-if="row.rank">
+          {{row.rank}}分
+        </span>
+        <span v-else>
+          <el-button
+            size="small"
+            type="success"
+            @click="handleRank($index, row, 8)">
+            好
+          </el-button>
+          <el-button
+            size="small"
+            type="warning"
+            @click="handleRank($index, row, 6)">
+            中
+          </el-button>
+          <el-button
+            size="small"
+            type="danger"
+            @click="handleRank($index, row, 3)">
+            差
+          </el-button>
+        </span>
         <!-- <el-button
           size="small"
           @click="handleEdit($index, row)">
@@ -36,10 +73,13 @@
       </div>
     </el-table-column>
   </el-table>
+
+
 </template>
 
 <script>
   import request from 'request'
+  import moment from 'moment'
 
   export default {
     data () {
@@ -50,12 +90,28 @@
     mounted () {
       request.get('/piece')
         .then((pieces) => {
+          console.log(pieces)
           this.pieces = pieces
+        })
+        .catch((err) => {
+          console.log(err)
         })
     },
     methods: {
+      timeStr (timestamp) {
+        return moment(timestamp).format('YYYY-MM-DD HH:mm')
+      },
       handleEdit (index, row) {
         // request.delete('/piece/' + row.objectId)
+      },
+      handleRank (index, row, rank) {
+        request.put('/piece/' + row.objectId, {
+          rank: rank
+        })
+        .then(() => {
+          this.pieces[index].rank = rank
+          this.pieces = this.pieces.concat([])
+        })
       },
       handleDelete (index, row) {
         if (confirm('确认删除该条记录么')) {

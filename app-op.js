@@ -88,6 +88,15 @@ app.get('/api/piece', auth, function(req, res) {
   })
 })
 
+app.put('/api/piece/:id', auth, function(req, res) {
+  AV.Cloud.run('rankPiece', {
+    id: req.params.id,
+    rank: req.body.rank
+  }).then((result) => {
+    res.json("success")
+  })
+})
+
 app.delete('/api/piece/:id', auth, function(req, res) {
   AV.Cloud.run('removePiece', {
     id: req.params.id

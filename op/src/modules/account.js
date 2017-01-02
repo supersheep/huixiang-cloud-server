@@ -19,9 +19,9 @@ var login = (name, password) => {
       localStorage.setItem('token', json.token)
       token = json.token
       resolve()
-    }).catch(() => {
+    }).catch((err) => {
       logout()
-      reject()
+      reject(err)
     })
   })
 }

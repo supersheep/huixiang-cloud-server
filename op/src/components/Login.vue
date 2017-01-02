@@ -38,6 +38,9 @@
               path: redir
             })
           })
+          .catch((err) => {
+            console.log(err)
+          })
       }
     }
   }

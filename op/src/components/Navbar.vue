@@ -1,7 +1,7 @@
 <template>
   <el-menu default-active="1" class="el-menu-demo" mode="horizontal" @select="handleSelect">
-    <el-menu-item index="1">首页</el-menu-item>
-    <el-menu-item index="2">用户内容维护</el-menu-item>
+    <el-menu-item index="1"><router-link to="/" tag="li">首页</router-link></el-menu-item>
+    <el-menu-item index="2"><router-link to="/piece" tag="li">用户内容维护</router-link></el-menu-item>
     <el-menu-item index="3">自建内容维护</el-menu-item>
     <el-menu-item index="4">当前环境: {{env}}</el-menu-item>
   </el-menu>
@@ -27,9 +27,10 @@
     },
     methods: {
       handleSelect (key, keyPath) {
-        if (keyPath === '2') {
-          location.href = '/op/piece'
-        }
+        console.log(key, keyPath, this.$router)
+        // if (key === '2') {
+        //   location.href = '/op/piece'
+        // }
       }
     }
   }
