@@ -11,6 +11,7 @@ Vue.use(ElementUI)
 Vue.use(VueRouter)
 
 const routes = [
+  { path: '/', meta: { auth: true }, component: require('./components/Home') },
   { path: '/piece', meta: { auth: true }, component: require('./components/PieceManager') },
   { path: '/login', component: require('./components/Login') },
   { path: '/test', meta: { auth: true }, component: require('./components/Test') }

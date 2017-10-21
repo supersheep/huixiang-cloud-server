@@ -69,6 +69,14 @@ function getPieceDetail (pieceId, user) {
   })
 }
 
+function _getAllPieces (i) {
+  var query = new AV.Query('Piece')
+  query.descending('createdAt')
+  query.skip(i * 1000)
+  query.limit(1000)
+  return query.find()
+}
+
 function getPieceList (page, filter) {
   return new Promise((resolve, reject) => {
     var query = new AV.Query('Piece')
@@ -77,11 +85,19 @@ function getPieceList (page, filter) {
     query.include('user')
     query.skip(Math.max(page - 1, 0) * limit)
     query.descending('createdAt')
-    query.notEqualTo('valid', false)
 
+    if (filter.valid === 'false') {
+      query.equalTo('valid', false)
+    } else {
+      query.notEqualTo('valid', false)
+    }
+
+    if (filter.rank) {
+      query.equalTo('rank', JSON.parse(filter.rank))
+    }
+    
     if (filter.userId) {
       var user = AV.Object.createWithoutData('_User', filter.userId);
-      console.log('filter by userId', filter.userId)
       query.equalTo('user', user)
     }
 
@@ -196,5 +212,6 @@ module.exports = {
   getUserFeeds: getUserFeeds,
   getHomeFeatured: getHomeFeatured,
   findPieceWithContent: findPieceWithContent,
-  getPieceList: getPieceList
+  getPieceList: getPieceList,
+  _getAllPieces: _getAllPieces
 }

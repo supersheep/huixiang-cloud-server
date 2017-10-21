@@ -23,7 +23,8 @@
     "express-partials": "^0.3.0",
     "jade": "^1.11.0",
     "jsonwebtoken": "^7.2.1",
-    "leanengine": "^1.0.0-beta",
+    "leancloud-storage": "^3.2.1",
+    "leanengine": "^3.0.2",
     "md5": "^2.2.1",
     "passport": "^0.3.2",
     "passport-http": "^0.3.0",
@@ -31,5 +32,9 @@
   },
   "engines": {
     "node": "4.x"
+  },
+  "devDependencies": {
+    "knex": "^0.13.0",
+    "mysql": "^2.15.0"
   }
 }

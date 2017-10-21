@@ -78,10 +78,25 @@ app.post('/api/login', function(req, res, next) {
     .catch(next)
 })
 
+app.get('/api/statistics', auth, function (req, res, next) {
+  var statistics = require('./services/statistics')
+  var Class = req.query.Class
+  var type = req.query.type
+  var query
+
+  statistics.getStat(req.query.Class, type)
+    .then((data) => {
+      res.send(data)
+    })
+    .catch(next)
+})
+
 app.get('/api/piece', auth, function(req, res) {
   AV.Cloud.run('getPieces', {
     page: req.query.page,
-    userId: req.query.userId
+    userId: req.query.userId,
+    rank: req.query.rank,
+    valid: req.query.valid
   }).then((result) => {
     res.json(result.map((data) => {
       return data.toJSON()
