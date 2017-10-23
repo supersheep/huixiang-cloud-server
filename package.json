@@ -35,6 +35,7 @@
   },
   "devDependencies": {
     "knex": "^0.13.0",
-    "mysql": "^2.15.0"
+    "mysql": "^2.15.0",
+    "node-segment": "^0.0.2"
   }
 }
