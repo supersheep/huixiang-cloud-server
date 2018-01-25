@@ -195,7 +195,8 @@ function getUserFeeds (user, page) {
       .then((favs) => {
         resolve(favs.map((fav) => {
           var piece = fav.get('piece')
-          piece.set('createdAt', fav.get('createdAt'))
+          piece.createAt = fav.get('createdAt')
+          // piece.set('createdAt', fav.get('createdAt'))
           return piece
         }))
       })
